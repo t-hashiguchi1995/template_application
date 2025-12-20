@@ -1,0 +1,105 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: asia-northeast1
+  GAR_LOCATION: asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/app-repo
+
+jobs:
+  deploy-backend:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.commits[0].modified, 'backend/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # OIDCに必須
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1. Google Cloud 認証 (Workload Identity Federation)
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      # 2. Docker認証
+      - name: Docker Auth
+        id: docker-auth
+        uses: docker/login-action@v3
+        with:
+          registry: asia-northeast1-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+
+      # 3. ビルド & Push (キャッシュ活用)
+      - name: Build and Push Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ env.GAR_LOCATION }}/backend:${{ github.sha }},${{ env.GAR_LOCATION }}/backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # 4. Cloud Run デプロイ
+      - name: Deploy Backend to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: my-app-backend
+          region: ${{ env.REGION }}
+          image: ${{ env.GAR_LOCATION }}/backend:${{ github.sha }}
+          flags: '--allow-unauthenticated' # 必要に応じて変更
+
+  deploy-frontend:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.commits[0].modified, 'frontend/')
+    needs: deploy-backend # バックエンドのデプロイを待つ場合は指定（任意）
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Google Auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Docker Auth
+        uses: docker/login-action@v3
+        with:
+          registry: asia-northeast1-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+
+      - name: Build and Push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ env.GAR_LOCATION }}/frontend:${{ github.sha }},${{ env.GAR_LOCATION }}/frontend:latest
+          build-args: |
+            VITE_API_URL=https://my-app-backend-uc.a.run.app # バックエンドのURLを注入
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy Frontend to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: my-app-frontend
+          region: ${{ env.REGION }}
+          image: ${{ env.GAR_LOCATION }}/frontend:${{ github.sha }}
+          flags: '--allow-unauthenticated'
