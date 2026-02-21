@@ -43,7 +43,12 @@ template_application/
 │   │   └── App.tsx      # メインアプリケーション
 │   ├── Dockerfile       # フロントエンド用Dockerfile
 │   └── package.json
-├── Dockerfile.backend   # バックエンド用Dockerfile
+├── backend/
+│   └── Dockerfile       # バックエンド用Dockerfile
+├── deploy/              # GCP Cloud Run デプロイ用
+│   ├── deploy_cloudrun.sh
+│   ├── README.md
+│   └── terraform/       # API 有効化・Artifact Registry 等
 ├── docker-compose.yml   # Docker Compose設定
 ├── Makefile            # 便利なMakeコマンド
 ├── pyproject.toml       # Python 依存関係
@@ -277,12 +282,17 @@ npm run dev
 ### Dockerイメージの個別ビルド
 
 ```bash
-# バックエンドのみビルド
-docker build -f Dockerfile.backend -t gemini-backend .
+# バックエンドのみビルド（コンテキストはリポジトリルート）
+docker build -f backend/Dockerfile -t gemini-backend .
 
 # フロントエンドのみビルド
 docker build -f frontend/Dockerfile -t gemini-frontend ./frontend
 ```
+
+## GCP Cloud Run へのデプロイ
+
+- デプロイ手順・Terraform（API 有効化・Artifact Registry）は [deploy/README.md](deploy/README.md) を参照してください。
+- リポジトリルートの `.env` に `PROJECT_ID` と `GEMINI_API_KEY`（または `GOOGLE_API_KEY`）を設定したうえで、`./deploy/deploy_cloudrun.sh` を実行します。
 
 ## 参考資料
 

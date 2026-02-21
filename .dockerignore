@@ -41,8 +41,8 @@ Thumbs.db
 .git/
 .gitignore
 
-# Docker
-Dockerfile*
+# Docker（ルート直下の Dockerfile のみ除外；backend/Dockerfile 等はビルドに必要）
+/Dockerfile*
 docker-compose*.yml
 .dockerignore
 

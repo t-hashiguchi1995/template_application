@@ -23,4 +23,3 @@ EXPOSE 8800
 
 # アプリケーションを起動
 CMD ["uv", "run", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8800"]
-

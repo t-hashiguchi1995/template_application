@@ -42,3 +42,10 @@ frontend/.vite/
 # Logs
 *.log
 logs/
+
+# Terraform
+deploy/terraform/.terraform/
+deploy/terraform/*.tfstate
+deploy/terraform/*.tfstate.*
+deploy/terraform/.terraform.lock.hcl
+deploy/terraform/terraform.tfvars
