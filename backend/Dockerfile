@@ -14,12 +14,12 @@ COPY backend/ ./backend/
 # 依存関係をインストール（プロジェクトも含めてインストール）
 RUN uv sync
 
-# 環境変数
+# 環境変数（Cloud Run は PORT=8080 を渡す。未設定時は 8800）
 ENV PYTHONPATH=/app
 ENV PORT=8800
 
 # ポートを公開
 EXPOSE 8800
 
-# アプリケーションを起動
-CMD ["uv", "run", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8800"]
+# アプリケーションを起動（PORT を参照して Cloud Run 互換に）
+CMD ["sh", "-c", "uv run uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8800}"]

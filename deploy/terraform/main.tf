@@ -51,14 +51,9 @@ resource "google_storage_bucket" "app" {
   name          = var.gcs_bucket_name
   location      = var.region
   force_destroy = false
-}
 
-# ブラウザからの直接 PUT 用 CORS
-resource "google_storage_bucket_cors" "app" {
-  count  = var.gcs_bucket_name != "" ? 1 : 0
-  bucket = google_storage_bucket.app[0].name
-
-  cors_rule {
+  # ブラウザからの直接 PUT 用 CORS
+  cors {
     origin          = ["*"]
     method          = ["GET", "PUT", "POST", "OPTIONS"]
     response_header = ["Content-Type", "Content-Length", "x-goog-resumable"]
