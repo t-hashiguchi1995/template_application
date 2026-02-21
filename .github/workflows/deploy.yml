@@ -23,7 +23,7 @@ jobs:
       id-token: write # OIDCに必須
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       # 1. Google Cloud 認証 (Workload Identity Federation)
       - name: Google Auth
@@ -71,7 +71,7 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Google Auth
         uses: google-github-actions/auth@v2
