@@ -26,6 +26,9 @@ uv.lock
 # IDE
 .vscode/
 .idea/
+
+# Cursor (MCP 認証情報を含むためリポジトリに含めない)
+.cursor/mcp.json
 *.swp
 *.swo
 *~
