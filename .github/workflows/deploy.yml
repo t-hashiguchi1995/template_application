@@ -55,7 +55,7 @@ jobs:
 
       # 4. Cloud Run デプロイ
       - name: Deploy Backend to Cloud Run
-        uses: google-github-actions/deploy-cloudrun@v2
+        uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: my-app-backend
           region: ${{ env.REGION }}
@@ -98,7 +98,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Deploy Frontend to Cloud Run
-        uses: google-github-actions/deploy-cloudrun@v2
+        uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: my-app-frontend
           region: ${{ env.REGION }}
