@@ -20,17 +20,17 @@ Terraform や `deploy_cloudrun.sh` は **Application Default Credentials (ADC)**
    ```
 2. **利用するプロジェクトを指定**
    ```bash
-   gcloud config set project thash-488104
+   gcloud config set project your-gcp-project-id
    ```
 3. **Terraform の `terraform.tfvars` で同じプロジェクト ID を指定**
-   - `project_id = "thash-488104"` のように設定
+   - `project_id = "your-gcp-project-id"` のように設定
 
 **ログイン状態の確認**
 
 | 確認項目 | コマンド | 期待する結果 |
 |----------|----------|--------------|
 | gcloud でログイン済みか | `gcloud auth list` | アクティブなアカウント（`*`）が表示される |
-| デフォルトプロジェクト | `gcloud config get-value project` | 使うプロジェクト ID（例: thash-488104） |
+| デフォルトプロジェクト | `gcloud config get-value project` | 使うプロジェクト ID（例: your-gcp-project-id） |
 | Terraform 用 ADC | `gcloud auth application-default print-access-token` | トークンが表示される（長い文字列） |
 
 ADC が未設定のときは `ERROR: Your default credentials were not found` と出ます。その場合はもう一度 `gcloud auth application-default login` を実行してください。
@@ -117,9 +117,9 @@ GEMINI_API_KEY=your-gemini-api-key
 # または GOOGLE_API_KEY=...
 
 # Terraform で SA と GCS を作成した場合（任意）
-# CLOUD_RUN_SA_ID=pdf-redacted
-# または CLOUD_RUN_SERVICE_ACCOUNT=pdf-redacted@PROJECT_ID.iam.gserviceaccount.com
-# GCS_BUCKET=pdf-redacted-your-gcp-project-id
+# CLOUD_RUN_SA_ID=template-app-sa
+# または CLOUD_RUN_SERVICE_ACCOUNT=template-app-sa@PROJECT_ID.iam.gserviceaccount.com
+# GCS_BUCKET=template-app-your-gcp-project-id
 ```
 
 - `REPO` は Terraform の `artifact_registry_repo` と同一にしてください（デフォルトは `app-repo`）。
@@ -138,7 +138,7 @@ GEMINI_API_KEY=your-gemini-api-key
 
 ## 動作確認（テスト実行）
 
-プロジェクトとリージョンは `.env` の `PROJECT_ID` / `REGION` に合わせてください（例: thash-488104, asia-northeast1）。サービス名は `SERVICE_BACKEND` の値（デフォルト `my-app-backend`）です。
+プロジェクトとリージョンは `.env` の `PROJECT_ID` / `REGION` に合わせてください。サービス名は `SERVICE_BACKEND` の値（デフォルト `my-app-backend`）です。
 
 ### 1. URL の確認
 
@@ -180,7 +180,7 @@ curl -s -H "Authorization: Bearer $TOKEN" "$URL/health"
 請求を止めたい場合は、Cloud Run サービスを削除します。最小インスタンス 0 のためトラフィックがなければ課金はほぼ発生しませんが、削除すれば完全に停止できます。
 
 ```bash
-gcloud config set project thash-488104   # 必要に応じてプロジェクト ID に変更
+gcloud config set project your-gcp-project-id   # 必要に応じてプロジェクト ID に変更
 gcloud run services delete my-app-backend --region asia-northeast1
 # 確認プロンプトで y
 ```

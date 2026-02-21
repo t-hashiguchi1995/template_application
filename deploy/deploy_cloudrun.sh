@@ -27,8 +27,8 @@ REPO="${REPO:-app-repo}"
 SERVICE_BACKEND="${SERVICE_BACKEND:-my-app-backend}"
 
 # オプション: Terraform で作成した SA と GCS を使う場合
-# CLOUD_RUN_SERVICE_ACCOUNT=pdf-redacted@PROJECT_ID.iam.gserviceaccount.com または
-# CLOUD_RUN_SA_ID=pdf-redacted で SA のみ指定可能
+# CLOUD_RUN_SERVICE_ACCOUNT=template-app-sa@PROJECT_ID.iam.gserviceaccount.com または
+# CLOUD_RUN_SA_ID=template-app-sa で SA のみ指定可能
 CLOUD_RUN_SERVICE_ACCOUNT="${CLOUD_RUN_SERVICE_ACCOUNT:-}"
 CLOUD_RUN_SA_ID="${CLOUD_RUN_SA_ID:-}"
 GCS_BUCKET="${GCS_BUCKET:-}"
